@@ -1,9 +1,10 @@
 steps:
 # running docker-compose
 - name: 'docker/compose'
-  args: ['up', '-d']
+  args: ['build']
   env:
   - 'DD_API_KEY=${_DD_API_KEY}'
   - 'DD_ENV=${_DD_ENV}'
+images: ['${_DC_LOCATION}-docker.pkg.dev/${_GCP_PROJECT_ID}/gcr-demo']
 options:
   logging: CLOUD_LOGGING_ONLY
