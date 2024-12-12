@@ -1,7 +1,7 @@
 services:
-  datadog-agent: # Datadog agent sidecar
-    hostname: datadog-agent
-    container_name: datadog-agent
+  gcr-demo-dd-agent: # Datadog agent sidecar
+    hostname: gcr-demo-dd-agent
+    container_name: gcr-demo-dd-agent
     image: gcr.io/datadoghq/agent:7.43.1
     pid: "host"
     ports:
@@ -42,8 +42,8 @@ services:
       - apparmor:unconfined
 
   gcr-demo-api:
-    hostname: datadog-agent
-    container_name: datadog-agent
+    hostname: gcr-demo-api
+    container_name: gcr-demo-api
     build:
       context: ./
       dockerfile: ./docker-files/api/Dockerfile
@@ -57,4 +57,4 @@ services:
       - DD_LOGS_INJECTION=true
       - DD_PROFILING_ENABLED=true
     depends_on:
-      - agent
+      - gcr-demo-dd-agent
