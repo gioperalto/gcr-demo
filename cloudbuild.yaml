@@ -5,3 +5,5 @@ steps:
   env:
   - 'DD_API_KEY=${_DD_API_KEY}'
   - 'DD_ENV=${_DD_ENV}'
+options:
+  logging: CLOUD_LOGGING_ONLY
