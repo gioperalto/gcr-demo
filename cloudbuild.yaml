@@ -1,0 +1,7 @@
+steps:
+# running docker-compose
+- name: 'docker/compose'
+  args: ['up', '-d']
+  env:
+  - 'DD_API_KEY=${_DD_API_KEY}'
+  - 'DD_ENV=${_DD_ENV}'
