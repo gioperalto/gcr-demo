@@ -2,11 +2,12 @@
 
 steps:
   - name: 'docker/compose'
-    args: ['build', 'gcr-demo-api', '-t', '${IMAGE_APP}']
+    args: ['build', '-t', '${_IMAGE_APP}', 'gcr-demo-api']
     env:
     - 'DD_API_KEY=${_DD_API_KEY}'
     - 'DD_ENV=${_DD_ENV}'
     id: BUILD_GCR_DEMO_API
+    waitFor: ["-"]
 
   - name: "gcr.io/cloud-builders/docker"
     env:
@@ -17,12 +18,13 @@ steps:
     waitFor:
       - BUILD_GCR_DEMO_API
 
-   - name: 'docker/compose'
-    args: ['build', 'gcr-demo-dd-agent', '-t', '${IMAGE_COLLECTOR}']
+  - name: 'docker/compose'
+    args: ['build', '-t', '${_IMAGE_COLLECTOR}', 'gcr-demo-dd-agent']
     env:
     - 'DD_API_KEY=${_DD_API_KEY}'
     - 'DD_ENV=${_DD_ENV}'
     id: BUILD_GCR_DEMO_DD_AGENT
+    waitFor: ["-"]
 
   - name: "gcr.io/cloud-builders/docker"
     env:
@@ -69,7 +71,7 @@ steps:
 substitutions:
   _SERVICE_NAME: gcr-demo
   _REGION: us-central1
-  _REGISTRY: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/gcr-demo
+  _REGISTRY: ${_REGION}-docker.pkg.dev/${_GCP_PROJECT_ID}/gcr-demo
   _IMAGE_APP: ${_REGISTRY}/api
   _IMAGE_COLLECTOR: ${_REGISTRY}/dd-agent
   # _SA_NAME: gcr-demo-sa
@@ -85,7 +87,7 @@ images:
 # * roles/logging.logWriter
 # * roles/artifactregistry.createOnPushWriter
 # * roles/run.admin
-# serviceAccount: "projects/${PROJECT_ID}/serviceAccounts/${_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+# serviceAccount: "projects/${_GCP_PROJECT_ID}/serviceAccounts/${_SA_NAME}@${_GCP_PROJECT_ID}.iam.gserviceaccount.com"
 
 options:
   dynamic_substitutions: true

@@ -1,0 +1,33 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations:
+    run.googleapis.com/launch-stage: ALPHA
+  name: "%SERVICE_NAME%"
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/execution-environment: gen1
+        run.googleapis.com/container-dependencies: '{"app":["collector"]}'
+    spec:
+      containers:
+        - image: "%SAMPLE_APP_IMAGE%"
+          name: app
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - mountPath: /logging
+              name: shared-logs
+        - image: "%DD_AGENT_IMAGE%"
+          name: collector
+          ports:
+            - containerPort: 8125
+          volumeMounts:
+            - mountPath: /logging
+              name: shared-logs
+      volumes:
+        - name: shared-logs
+          emptyDir:
+            medium: Memory
+            sizeLimit: 512Mi
