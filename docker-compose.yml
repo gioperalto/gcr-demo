@@ -1,10 +1,11 @@
 version: '3'
 
 services:
-  gcr-demo-dd-agent: # Datadog agent sidecar
-    hostname: gcr-demo-dd-agent
-    container_name: gcr-demo-dd-agent
-    image: gcr.io/datadoghq/agent:7.43.1
+  dd-agent: # Datadog agent sidecar
+    container_name: dd-agent
+    build:
+      context: ./
+      dockerfile: ./docker-files/dd-agent/Dockerfile
     pid: "host"
     ports:
       - "8125:8125/udp" # APM
@@ -43,9 +44,8 @@ services:
     security_opt:
       - apparmor:unconfined
 
-  gcr-demo-api:
-    hostname: gcr-demo-api
-    container_name: gcr-demo-api
+  api:
+    container_name: api
     build:
       context: ./
       dockerfile: ./docker-files/api/Dockerfile
@@ -59,4 +59,4 @@ services:
       - DD_LOGS_INJECTION=true
       - DD_PROFILING_ENABLED=true
     depends_on:
-      - gcr-demo-dd-agent
+      - dd-agent
