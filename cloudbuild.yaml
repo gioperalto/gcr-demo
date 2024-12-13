@@ -1,10 +1,92 @@
+# Google Cloud Run deployment with Datadog sidecar
+
 steps:
-# running docker-compose
-- name: 'docker/compose'
-  args: ['build']
-  env:
-  - 'DD_API_KEY=${_DD_API_KEY}'
-  - 'DD_ENV=${_DD_ENV}'
-images: ['${_DC_LOCATION}-docker.pkg.dev/${_GCP_PROJECT_ID}/gcr-demo']
+  - name: 'docker/compose'
+    args: ['build', 'gcr-demo-api', '-t', '${IMAGE_APP}']
+    env:
+    - 'DD_API_KEY=${_DD_API_KEY}'
+    - 'DD_ENV=${_DD_ENV}'
+    id: BUILD_GCR_DEMO_API
+
+  - name: "gcr.io/cloud-builders/docker"
+    env:
+      - "IMAGE_APP=${_IMAGE_APP}"
+    script: |
+      docker push ${IMAGE_APP}
+    id: PUSH_GCR_DEMO_API
+    waitFor:
+      - BUILD_GCR_DEMO_API
+
+   - name: 'docker/compose'
+    args: ['build', 'gcr-demo-dd-agent', '-t', '${IMAGE_COLLECTOR}']
+    env:
+    - 'DD_API_KEY=${_DD_API_KEY}'
+    - 'DD_ENV=${_DD_ENV}'
+    id: BUILD_GCR_DEMO_DD_AGENT
+
+  - name: "gcr.io/cloud-builders/docker"
+    env:
+      - "IMAGE_COLLECTOR=${_IMAGE_COLLECTOR}"
+    script: |
+      docker push ${IMAGE_COLLECTOR}
+    id: PUSH_GCR_DEMO_DD_AGENT
+    waitFor:
+      - BUILD_GCR_DEMO_DD_AGENT
+
+  - name: "ubuntu"
+    env:
+      - "SERVICE_NAME=${_SERVICE_NAME}"
+      - "IMAGE_APP=${_IMAGE_APP}"
+      - "IMAGE_COLLECTOR=${_IMAGE_COLLECTOR}"
+    script: |
+      sed -i s@%SERVICE_NAME%@${SERVICE_NAME}@g run-service.yaml
+      sed -i s@%DD_AGENT_IMAGE%@${IMAGE_COLLECTOR}@g run-service.yaml
+      sed -i s@%SAMPLE_APP_IMAGE%@${IMAGE_APP}@g run-service.yaml
+    id: REPLACE_YAML_VALUE
+    waitFor: ["-"]
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    env:
+      - "REGION=${_REGION}"
+    script: |
+      gcloud run services replace run-service.yaml --region ${REGION} --quiet
+    id: DEPLOY_MULTICONTAINER
+    waitFor:
+      - PUSH_GCR_DEMO_API
+      - PUSH_GCR_DEMO_DD_AGENT
+      - REPLACE_YAML_VALUE
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
+    env:
+      - "REGION=${_REGION}"
+      - "SERVICE_NAME=${_SERVICE_NAME}"
+    script: |
+      gcloud run services set-iam-policy ${SERVICE_NAME} policy.yaml --region ${REGION} --quiet
+    id: ALLOW_UNAUTHENTICATED
+    waitFor:
+      - DEPLOY_MULTICONTAINER
+
+substitutions:
+  _SERVICE_NAME: gcr-demo
+  _REGION: us-central1
+  _REGISTRY: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/gcr-demo
+  _IMAGE_APP: ${_REGISTRY}/api
+  _IMAGE_COLLECTOR: ${_REGISTRY}/dd-agent
+  # _SA_NAME: gcr-demo-sa
+
+images:
+  - ${_IMAGE_APP}
+  - ${_IMAGE_COLLECTOR}
+
+# comment out the following line if you want to run Cloud Build with the existing
+# service account with the following roles.
+# * roles/iam.serviceAccountUser
+# * roles/storage.objectViewer
+# * roles/logging.logWriter
+# * roles/artifactregistry.createOnPushWriter
+# * roles/run.admin
+# serviceAccount: "projects/${PROJECT_ID}/serviceAccounts/${_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+
 options:
+  dynamic_substitutions: true
   logging: CLOUD_LOGGING_ONLY
