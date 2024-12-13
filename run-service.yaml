@@ -21,8 +21,6 @@ spec:
               name: shared-logs
         - image: "%DD_AGENT_IMAGE%"
           name: collector
-          ports:
-            - containerPort: 8125
           volumeMounts:
             - mountPath: /logging
               name: shared-logs
