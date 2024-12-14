@@ -1,0 +1,70 @@
+#!/bin/bash
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -ex
+
+PROJECT_ID=$(gcloud config get-value project)
+SA_NAME="gcr-demo-sa"
+REGION="us-central1"
+
+#### Create service account with required roles
+gcloud iam service-accounts create "${SA_NAME}" \
+  --description="A service account just to used for Google Cloud Run Demo." \
+  --display-name="Google Cloud Run Demo service account" \
+  --quiet
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountUser" \
+  --condition=None \
+  --quiet
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/storage.objectUser" \
+  --condition=None \
+  --quiet
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/logging.logWriter" \
+  --condition=None \
+  --quiet
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/artifactregistry.createOnPushWriter" \
+  --condition=None \
+  --quiet
+
+# In order to change policy of the run service, it requires 'run.services.setIamPolicy',
+# which is contained in run.admin role
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/run.admin" \
+  --condition=None \
+  --quiet
+
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/run.serviceAgent" \
+  --condition=None \
+  --quiet
+
+#### Create artifact registry
+gcloud artifacts repositories create run-otel-example \
+  --location "${REGION}" \
+  --repository-format=docker \
+  --quiet
