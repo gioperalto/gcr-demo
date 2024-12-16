@@ -19,15 +19,15 @@ steps:
     waitFor:
       - BUILD_GCR_DEMO
 
-  - name: "gcr.io/cloud-builders/docker"
-    env:
-      - "COLLECTOR_NAME=${_COLLECTOR_NAME}"
-      - "IMAGE_COLLECTOR=${_IMAGE_COLLECTOR}"
-    script: |
-      docker tag ${COLLECTOR_NAME} ${IMAGE_COLLECTOR}
-    id: TAG_GCR_DEMO_DD_AGENT
-    waitFor:
-      - BUILD_GCR_DEMO
+  # - name: "gcr.io/cloud-builders/docker"
+  #   env:
+  #     - "COLLECTOR_NAME=${_COLLECTOR_NAME}"
+  #     - "IMAGE_COLLECTOR=${_IMAGE_COLLECTOR}"
+  #   script: |
+  #     docker tag ${COLLECTOR_NAME} ${IMAGE_COLLECTOR}
+  #   id: TAG_GCR_DEMO_DD_AGENT
+  #   waitFor:
+  #     - BUILD_GCR_DEMO
 
   - name: "gcr.io/cloud-builders/docker"
     env:
@@ -38,14 +38,14 @@ steps:
     waitFor:
       - TAG_GCR_DEMO_API
 
-  - name: "gcr.io/cloud-builders/docker"
-    env:
-      - "IMAGE_COLLECTOR=${_IMAGE_COLLECTOR}"
-    script: |
-      docker push ${IMAGE_COLLECTOR}
-    id: PUSH_GCR_DEMO_DD_AGENT
-    waitFor:
-      -  TAG_GCR_DEMO_DD_AGENT
+  # - name: "gcr.io/cloud-builders/docker"
+  #   env:
+  #     - "IMAGE_COLLECTOR=${_IMAGE_COLLECTOR}"
+  #   script: |
+  #     docker push ${IMAGE_COLLECTOR}
+  #   id: PUSH_GCR_DEMO_DD_AGENT
+  #   waitFor:
+  #     -  TAG_GCR_DEMO_DD_AGENT
 
   - name: "ubuntu"
     env:
@@ -67,7 +67,7 @@ steps:
     id: DEPLOY_MULTICONTAINER
     waitFor:
       - PUSH_GCR_DEMO_API
-      - PUSH_GCR_DEMO_DD_AGENT
+      # - PUSH_GCR_DEMO_DD_AGENT
       - REPLACE_YAML_VALUE
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim"
@@ -92,7 +92,7 @@ substitutions:
 
 images:
   - ${_IMAGE_APP}
-  - ${_IMAGE_COLLECTOR}
+  # - ${_IMAGE_COLLECTOR}
 
 # comment out the following line if you want to run Cloud Build with the existing
 # service account with the following roles.

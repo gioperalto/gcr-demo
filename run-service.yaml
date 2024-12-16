@@ -9,7 +9,7 @@ spec:
     metadata:
       annotations:
         run.googleapis.com/execution-environment: gen1
-        run.googleapis.com/container-dependencies: '{"app":["collector"]}'
+      #   run.googleapis.com/container-dependencies: '{"app":["collector"]}'
     spec:
       containers:
         - image: "%SAMPLE_APP_IMAGE%"
@@ -20,39 +20,40 @@ spec:
             httpGet:
               path: /
               port: 3000
-          # volumeMounts:
-          #   - mountPath: /logging
-          #     name: shared-logs
-        - image: "%DD_AGENT_IMAGE%"
-          name: collector
-          env:
-            - name: DD_HEALTH_PORT
-              value: "5555"
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "200m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
-          # volumeMounts:
-          #   - name: dockersocket
-          #     mountPath: /var/run/docker.sock
-          startupProbe:
-            httpGet:
-              path: /health
-              port: 5555
             initialDelaySeconds: 15
-            periodSeconds: 15
-            timeoutSeconds: 5
-            successThreshold: 1
-            failureThreshold: 3
+      #     volumeMounts:
+      #       - mountPath: /logging
+      #         name: shared-logs
+      #   - image: "%DD_AGENT_IMAGE%"
+      #     name: collector
+      #     env:
+      #       - name: DD_HEALTH_PORT
+      #         value: "5555"
+      #     resources:
+      #       requests:
+      #         memory: "256Mi"
+      #         cpu: "200m"
+      #       limits:
+      #         memory: "256Mi"
+      #         cpu: "200m"
+      #     volumeMounts:
+      #       - name: dockersocket
+      #         mountPath: /var/run/docker.sock
+      #     startupProbe:
+      #       httpGet:
+      #         path: /health
+      #         port: 5555
+      #       initialDelaySeconds: 15
+      #       periodSeconds: 15
+      #       timeoutSeconds: 5
+      #       successThreshold: 1
+      #       failureThreshold: 3
       # volumes:
       #   - name: shared-logs
       #     emptyDir:
       #       medium: Memory
       #       sizeLimit: 512Mi
-        # volumes:
-        #   - hostPath:
-        #       path: /var/run/docker.sock
-        #     name: dockersocket
+      #   volumes:
+      #     - hostPath:
+      #         path: /var/run/docker.sock
+      #       name: dockersocket
