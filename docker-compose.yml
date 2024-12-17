@@ -51,15 +51,15 @@ services:
       dockerfile: ./docker-files/api/Dockerfile
     ports:
       - "3000:3000"
-    environment:
+    # environment:
       # - DD_AGENT_HOST=${DD_ENV}
-      - DD_API_KEY=${DD_API_KEY}
-      - DD_ENV=${DD_ENV}
-      - DD_SITE=datadoghq.com
-      - DD_SERVICE=api-service
-      - DD_RUNTIME_METRICS_ENABLED=true
-      - DD_LOGS_ENABLED=true
-      - DD_LOGS_INJECTION=true
-      - DD_PROFILING_ENABLED=true
+      # - DD_API_KEY=${DD_API_KEY}
+      # - DD_ENV=${DD_ENV}
+      # - DD_SITE=datadoghq.com
+      # - DD_SERVICE=api-service
+      # - DD_RUNTIME_METRICS_ENABLED=true
+      # - DD_LOGS_ENABLED=true
+      # - DD_LOGS_INJECTION=true
+      # - DD_PROFILING_ENABLED=true
     # depends_on:
     #   - dd-agent
