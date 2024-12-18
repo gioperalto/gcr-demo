@@ -23,7 +23,7 @@ resource "google_logging_project_sink" "datadog-sink" {
 }
 
 resource "google_project_iam_member" "pubsub-publisher-permisson" {
-  role   = "roles/pubsub.publisher"
-  member = google_logging_project_sink.datadog-sink.writer_identity
+  role    = "roles/pubsub.publisher"
+  member  = google_logging_project_sink.datadog-sink.writer_identity
   project = var.project
 }

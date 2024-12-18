@@ -10,7 +10,6 @@ terraform {
 provider "google" {
   project = var.project
   region  = var.region
-  zone    = var.zone
 }
 
 resource "google_cloud_run_service" "tf_nestjs_service" {
@@ -21,13 +20,13 @@ resource "google_cloud_run_service" "tf_nestjs_service" {
       containers {
         image = "${var.region}-docker.pkg.dev/${var.project}/gcr-demo/gcr-demo_api:latest"
         ports {
-            container_port = 3000
+          container_port = 3000
         }
         startup_probe {
-            http_get {
-                path = "/"
-                port = 3000
-            }
+          http_get {
+            path = "/"
+            port = 3000
+          }
         }
       }
     }
