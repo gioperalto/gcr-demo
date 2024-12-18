@@ -8,18 +8,18 @@ terraform {
 }
 
 provider "google" {
-  project = "tracer-334622"
-  region  = "us-central1"
-  zone    = "us-central1-c"
+  project = var.project
+  region  = var.region
+  zone    = var.zone
 }
 
 resource "google_cloud_run_service" "tf_nestjs_service" {
   name     = "tf-nestjs-service"
-  location = "us-central1"
+  location = var.region
   template {
     spec {
       containers {
-        image = "us-central1-docker.pkg.dev/tracer-334622/gcr-demo/gcr-demo_api:latest"
+        image = "${var.region}-docker.pkg.dev/${var.project}/gcr-demo/gcr-demo_api:latest"
         ports {
             container_port = 3000
         }
