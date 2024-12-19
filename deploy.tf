@@ -1,17 +1,4 @@
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "6.8.0"
-    }
-  }
-}
-
-provider "google" {
-  project = var.project
-  region  = var.region
-}
-
+# Deploy NestJS service via Cloud Run
 resource "google_cloud_run_service" "tf_nestjs_service" {
   name     = "tf-nestjs-service"
   location = var.region
