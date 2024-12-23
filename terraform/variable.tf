@@ -1,8 +1,13 @@
 # variable.tf 
 
-variable "datadog_key" {
+variable "datadog_api_key" {
   type        = string
   description = "Datadog API Key"
+}
+
+variable "datadog_app_key" {
+  type        = string
+  description = "Datadog App Key"
 }
 
 variable "project" {
@@ -21,11 +26,11 @@ variable "datadog_logs_api_url" {
 }
 
 variable "port" {
-  type = number
+  type        = number
   description = "web application port"
 }
 
 variable "image_url" {
-  type = string
+  type        = string
   description = "URL for image used for deployment"
 }

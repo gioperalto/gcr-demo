@@ -5,7 +5,7 @@ resource "google_cloud_run_service" "web_app_service" {
   template {
     spec {
       containers {
-        image = "${var.image_url}"
+        image = var.image_url
         ports {
           container_port = var.port
         }

@@ -6,7 +6,7 @@ resource "google_service_account" "datadog_gcp_integration_sa" {
 }
 
 # Define IAM roles needed for the Dataflow Service Account
-resource "google_project_iam_member" "dataflow_datadog_sa_roles" {
+resource "google_project_iam_member" "datadog_gcp_integration_sa_roles" {
   project = var.project
   for_each = toset([
     "roles/monitoring.viewer",
