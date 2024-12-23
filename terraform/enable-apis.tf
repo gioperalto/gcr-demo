@@ -14,7 +14,8 @@
 
 # Enable GCP APIs
 resource "google_project_service" "enable_apis" {
-  project = var.project
+  project            = var.project
+  disable_on_destroy = false
 
   for_each = toset([
     "secretmanager.googleapis.com",
@@ -26,10 +27,4 @@ resource "google_project_service" "enable_apis" {
   ])
 
   service = each.key
-}
-
-# Wait for Dataflow 'producer' SA to be created.
-resource "time_sleep" "dataflow_sa_creation" {
-  depends_on      = [google_project_service.enable_apis]
-  create_duration = "55s"
 }
